@@ -28,7 +28,7 @@
   "devDependencies": {
     "babelify": "^7.3.0",
     "mocha": "^2.4.5",
-    "rdf-data-model": "git://github.com/rdf-ext/rdf-data-model.git#v1",
+    "rdf-data-model": "git://github.com/rdf-ext/rdf-data-model.git#develop",
     "standard": "^7.0.1"
   },
   "readmeFilename": "README.md",
