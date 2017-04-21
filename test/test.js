@@ -21,7 +21,7 @@ function streamToPromiseError (stream) {
   })
 }
 
-describe('rdf-filter-stream', () => {
+describe('rdf-stream-filter', () => {
   it('should be a constructor', () => {
     assert.equal(typeof FilterStream, 'function')
   })

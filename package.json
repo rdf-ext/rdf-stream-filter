@@ -1,5 +1,5 @@
 {
-  "name": "rdf-filter-stream",
+  "name": "rdf-stream-filter",
   "version": "0.9.0",
   "description": "Filters a RDFJS Stream using a filter callback or quad pattern",
   "main": "index.js",
@@ -21,9 +21,9 @@
   "author": "Thomas Bergwinkl <bergi@axolotlfarm.org> (https://www.bergnet.org/people/bergi/card#me)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rdf-ext/rdf-filter-stream/issues"
+    "url": "https://github.com/rdf-ext/rdf-stream-filter/issues"
   },
-  "homepage": "https://github.com/rdf-ext/rdf-filter-stream",
+  "homepage": "https://github.com/rdf-ext/rdf-stream-filter",
   "dependencies": {
     "readable-stream": "^2.2.3"
   },
