@@ -1,6 +1,4 @@
-'use strict'
-
-const Readable = require('readable-stream')
+import { Readable } from 'readable-stream'
 
 function buildQuadFilter (subject, predicate, object, graph) {
   return function (quad) {
@@ -32,13 +30,13 @@ class FilterStream extends Readable {
 
     this._readableState.objectMode = true
 
-    let filter = typeof subject === 'function' ? subject : buildQuadFilter(subject, predicate, object, graph)
+    const filter = typeof subject === 'function' ? subject : buildQuadFilter(subject, predicate, object, graph)
 
     input.once('close', () => {
       this.emit('close')
     })
 
-    input.on('data', (quad) => {
+    input.on('data', quad => {
       if (filter(quad)) {
         this.push(quad)
       }
@@ -48,11 +46,11 @@ class FilterStream extends Readable {
       this.emit('end')
     })
 
-    input.on('error', (err) => {
+    input.on('error', err => {
       this.emit('error', err)
     })
 
-    input.on('prefix', (map) => {
+    input.on('prefix', map => {
       this.emit('prefix', map)
     })
   }
@@ -61,4 +59,4 @@ class FilterStream extends Readable {
   }
 }
 
-module.exports = FilterStream
+export default FilterStream

@@ -1,11 +1,9 @@
-'use strict'
-
-/* global describe, it */
-
-const assert = require('assert')
-const rdf = require('rdf-data-model')
-const EventEmitter = require('events').EventEmitter
-const FilterStream = require('..')
+import { strictEqual } from 'node:assert'
+import { EventEmitter } from 'node:events'
+import rdf from '@rdfjs/data-model'
+import { describe, it } from 'mocha'
+import { quadEqual } from 'rdf-test/assert.js'
+import FilterStream from '../index.js'
 
 function streamToPromise (stream) {
   return new Promise((resolve, reject) => {
@@ -23,20 +21,20 @@ function streamToPromiseError (stream) {
 
 describe('rdf-stream-filter', () => {
   it('should be a constructor', () => {
-    assert.equal(typeof FilterStream, 'function')
+    strictEqual(typeof FilterStream, 'function')
   })
 
   it('should forward the end event', () => {
-    let input = new EventEmitter()
-    let filter = new FilterStream(input)
+    const input = new EventEmitter()
+    const filter = new FilterStream(input)
     let emitted = false
 
     filter.on('end', () => {
       emitted = true
     })
 
-    let result = streamToPromise(input).then(() => {
-      assert.equal(emitted, true)
+    const result = streamToPromise(input).then(() => {
+      strictEqual(emitted, true)
     })
 
     input.emit('end')
@@ -45,16 +43,16 @@ describe('rdf-stream-filter', () => {
   })
 
   it('should forward the error event', () => {
-    let input = new EventEmitter()
-    let filter = new FilterStream(input)
+    const input = new EventEmitter()
+    const filter = new FilterStream(input)
     let emitted = false
 
     filter.on('error', () => {
       emitted = true
     })
 
-    let result = streamToPromiseError(input).then(() => {
-      assert.equal(emitted, true)
+    const result = streamToPromiseError(input).then(() => {
+      strictEqual(emitted, true)
     })
 
     input.emit('error')
@@ -63,16 +61,16 @@ describe('rdf-stream-filter', () => {
   })
 
   it('should forward the prefix event', () => {
-    let input = new EventEmitter()
-    let filter = new FilterStream(input)
+    const input = new EventEmitter()
+    const filter = new FilterStream(input)
     let emittedMap = null
 
-    filter.on('prefix', (map) => {
+    filter.on('prefix', map => {
       emittedMap = map
     })
 
-    let result = streamToPromise(input).then(() => {
-      assert.equal(emittedMap, 'example')
+    const result = streamToPromise(input).then(() => {
+      strictEqual(emittedMap, 'example')
     })
 
     input.emit('prefix', 'example')
@@ -82,22 +80,22 @@ describe('rdf-stream-filter', () => {
   })
 
   it('should use a quad pattern filter', () => {
-    let subject = rdf.namedNode('http://example.org/subject')
-    let predicate = rdf.namedNode('http://example.org/predicate')
-    let object = rdf.namedNode('http://example.org/object')
-    let graph = rdf.namedNode('http://example.org/graph')
-    let quad = rdf.quad(subject, predicate, object, graph)
-    let input = new EventEmitter()
-    let filter = new FilterStream(input, subject, predicate, object, graph)
-    let output = []
+    const subject = rdf.namedNode('http://example.org/subject')
+    const predicate = rdf.namedNode('http://example.org/predicate')
+    const object = rdf.namedNode('http://example.org/object')
+    const graph = rdf.namedNode('http://example.org/graph')
+    const quad = rdf.quad(subject, predicate, object, graph)
+    const input = new EventEmitter()
+    const filter = new FilterStream(input, subject, predicate, object, graph)
+    const output = []
 
-    filter.on('data', (quad) => {
+    filter.on('data', quad => {
       output.push(quad)
     })
 
-    let result = streamToPromise(filter).then(() => {
-      assert.equal(output.length, 1)
-      assert.equal(output[0].equals(quad), true)
+    const result = streamToPromise(filter).then(() => {
+      strictEqual(output.length, 1)
+      quadEqual(output[0], quad)
     })
 
     input.emit('data', quad)
@@ -107,24 +105,24 @@ describe('rdf-stream-filter', () => {
   })
 
   it('should check subject in quad pattern filter', () => {
-    let subject1 = rdf.namedNode('http://example.org/subject1')
-    let subject2 = rdf.namedNode('http://example.org/subject2')
-    let predicate = rdf.namedNode('http://example.org/predicate')
-    let object = rdf.namedNode('http://example.org/object')
-    let graph = rdf.namedNode('http://example.org/graph')
-    let quad1 = rdf.quad(subject1, predicate, object, graph)
-    let quad2 = rdf.quad(subject2, predicate, object, graph)
-    let input = new EventEmitter()
-    let filter = new FilterStream(input, subject1, predicate, object, graph)
-    let output = []
+    const subject1 = rdf.namedNode('http://example.org/subject1')
+    const subject2 = rdf.namedNode('http://example.org/subject2')
+    const predicate = rdf.namedNode('http://example.org/predicate')
+    const object = rdf.namedNode('http://example.org/object')
+    const graph = rdf.namedNode('http://example.org/graph')
+    const quad1 = rdf.quad(subject1, predicate, object, graph)
+    const quad2 = rdf.quad(subject2, predicate, object, graph)
+    const input = new EventEmitter()
+    const filter = new FilterStream(input, subject1, predicate, object, graph)
+    const output = []
 
-    filter.on('data', (quad) => {
+    filter.on('data', quad => {
       output.push(quad)
     })
 
-    let result = streamToPromise(filter).then(() => {
-      assert.equal(output.length, 1)
-      assert.equal(output[0].equals(quad1), true)
+    const result = streamToPromise(filter).then(() => {
+      strictEqual(output.length, 1)
+      quadEqual(output[0], quad1)
     })
 
     input.emit('data', quad1)
@@ -135,24 +133,24 @@ describe('rdf-stream-filter', () => {
   })
 
   it('should check predicate in quad pattern filter', () => {
-    let subject = rdf.namedNode('http://example.org/subject')
-    let predicate1 = rdf.namedNode('http://example.org/predicate1')
-    let predicate2 = rdf.namedNode('http://example.org/predicate2')
-    let object = rdf.namedNode('http://example.org/object')
-    let graph = rdf.namedNode('http://example.org/graph')
-    let quad1 = rdf.quad(subject, predicate1, object, graph)
-    let quad2 = rdf.quad(subject, predicate2, object, graph)
-    let input = new EventEmitter()
-    let filter = new FilterStream(input, subject, predicate1, object, graph)
-    let output = []
+    const subject = rdf.namedNode('http://example.org/subject')
+    const predicate1 = rdf.namedNode('http://example.org/predicate1')
+    const predicate2 = rdf.namedNode('http://example.org/predicate2')
+    const object = rdf.namedNode('http://example.org/object')
+    const graph = rdf.namedNode('http://example.org/graph')
+    const quad1 = rdf.quad(subject, predicate1, object, graph)
+    const quad2 = rdf.quad(subject, predicate2, object, graph)
+    const input = new EventEmitter()
+    const filter = new FilterStream(input, subject, predicate1, object, graph)
+    const output = []
 
-    filter.on('data', (quad) => {
+    filter.on('data', quad => {
       output.push(quad)
     })
 
-    let result = streamToPromise(filter).then(() => {
-      assert.equal(output.length, 1)
-      assert.equal(output[0].equals(quad1), true)
+    const result = streamToPromise(filter).then(() => {
+      strictEqual(output.length, 1)
+      quadEqual(output[0], quad1)
     })
 
     input.emit('data', quad1)
@@ -163,24 +161,24 @@ describe('rdf-stream-filter', () => {
   })
 
   it('should check object in quad pattern filter', () => {
-    let subject = rdf.namedNode('http://example.org/subject')
-    let predicate = rdf.namedNode('http://example.org/predicate')
-    let object1 = rdf.namedNode('http://example.org/object1')
-    let object2 = rdf.namedNode('http://example.org/object2')
-    let graph = rdf.namedNode('http://example.org/graph')
-    let quad1 = rdf.quad(subject, predicate, object1, graph)
-    let quad2 = rdf.quad(subject, predicate, object2, graph)
-    let input = new EventEmitter()
-    let filter = new FilterStream(input, subject, predicate, object1, graph)
-    let output = []
+    const subject = rdf.namedNode('http://example.org/subject')
+    const predicate = rdf.namedNode('http://example.org/predicate')
+    const object1 = rdf.namedNode('http://example.org/object1')
+    const object2 = rdf.namedNode('http://example.org/object2')
+    const graph = rdf.namedNode('http://example.org/graph')
+    const quad1 = rdf.quad(subject, predicate, object1, graph)
+    const quad2 = rdf.quad(subject, predicate, object2, graph)
+    const input = new EventEmitter()
+    const filter = new FilterStream(input, subject, predicate, object1, graph)
+    const output = []
 
-    filter.on('data', (quad) => {
+    filter.on('data', quad => {
       output.push(quad)
     })
 
-    let result = streamToPromise(filter).then(() => {
-      assert.equal(output.length, 1)
-      assert.equal(output[0].equals(quad1), true)
+    const result = streamToPromise(filter).then(() => {
+      strictEqual(output.length, 1)
+      quadEqual(output[0], quad1)
     })
 
     input.emit('data', quad1)
@@ -191,24 +189,24 @@ describe('rdf-stream-filter', () => {
   })
 
   it('should check graph in quad pattern filter', () => {
-    let subject = rdf.namedNode('http://example.org/subject')
-    let predicate = rdf.namedNode('http://example.org/predicate')
-    let object = rdf.namedNode('http://example.org/object')
-    let graph1 = rdf.namedNode('http://example.org/graph1')
-    let graph2 = rdf.namedNode('http://example.org/graph2')
-    let quad1 = rdf.quad(subject, predicate, object, graph1)
-    let quad2 = rdf.quad(subject, predicate, object, graph2)
-    let input = new EventEmitter()
-    let filter = new FilterStream(input, subject, predicate, object, graph1)
-    let output = []
+    const subject = rdf.namedNode('http://example.org/subject')
+    const predicate = rdf.namedNode('http://example.org/predicate')
+    const object = rdf.namedNode('http://example.org/object')
+    const graph1 = rdf.namedNode('http://example.org/graph1')
+    const graph2 = rdf.namedNode('http://example.org/graph2')
+    const quad1 = rdf.quad(subject, predicate, object, graph1)
+    const quad2 = rdf.quad(subject, predicate, object, graph2)
+    const input = new EventEmitter()
+    const filter = new FilterStream(input, subject, predicate, object, graph1)
+    const output = []
 
-    filter.on('data', (quad) => {
+    filter.on('data', quad => {
       output.push(quad)
     })
 
-    let result = streamToPromise(filter).then(() => {
-      assert.equal(output.length, 1)
-      assert.equal(output[0].equals(quad1), true)
+    const result = streamToPromise(filter).then(() => {
+      strictEqual(output.length, 1)
+      quadEqual(output[0], quad1)
     })
 
     input.emit('data', quad1)
@@ -219,26 +217,26 @@ describe('rdf-stream-filter', () => {
   })
 
   it('should use a callback filter if second argument is a function', () => {
-    let subject = rdf.namedNode('http://example.org/subject')
-    let predicate = rdf.namedNode('http://example.org/predicate')
-    let object = rdf.namedNode('http://example.org/object')
-    let graph1 = rdf.namedNode('http://example.org/graph1')
-    let graph2 = rdf.namedNode('http://example.org/graph2')
-    let quad1 = rdf.quad(subject, predicate, object, graph1)
-    let quad2 = rdf.quad(subject, predicate, object, graph2)
-    let input = new EventEmitter()
-    let filter = new FilterStream(input, (quad) => {
+    const subject = rdf.namedNode('http://example.org/subject')
+    const predicate = rdf.namedNode('http://example.org/predicate')
+    const object = rdf.namedNode('http://example.org/object')
+    const graph1 = rdf.namedNode('http://example.org/graph1')
+    const graph2 = rdf.namedNode('http://example.org/graph2')
+    const quad1 = rdf.quad(subject, predicate, object, graph1)
+    const quad2 = rdf.quad(subject, predicate, object, graph2)
+    const input = new EventEmitter()
+    const filter = new FilterStream(input, quad => {
       return quad.graph.equals(graph1)
     })
-    let output = []
+    const output = []
 
-    filter.on('data', (quad) => {
+    filter.on('data', quad => {
       output.push(quad)
     })
 
-    let result = streamToPromise(filter).then(() => {
-      assert.equal(output.length, 1)
-      assert.equal(output[0].equals(quad1), true)
+    const result = streamToPromise(filter).then(() => {
+      strictEqual(output.length, 1)
+      quadEqual(output[0], quad1)
     })
 
     input.emit('data', quad1)
