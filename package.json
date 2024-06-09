@@ -1,6 +1,6 @@
 {
   "name": "rdf-stream-filter",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Filters a RDF/JS Stream using a filter callback or quad pattern",
   "type": "module",
   "main": "index.js",
